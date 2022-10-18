@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model areas {
+  id                  Int                   @id @default(autoincrement())
+  abstract            String
+  image               String?               @db.VarChar(255)
+  name                String                @unique @db.VarChar(255)
+  createdAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  deletedAt           DateTime?             @db.Timestamptz(6)
+  deleted             Boolean?              @default(false)
+  members             members[]
+  projectParticipants projectParticipants[]
+}
+
+model career {
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(255)
+  name      String    @unique @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  deleted   Boolean?  @default(false)
+  members   members[]
+}
+
+model members {
+  id                  Int                   @id @default(autoincrement())
+  areaId              Int
+  birthday            DateTime              @db.Timestamptz(6)
+  careerId            Int
+  code                String                @db.VarChar(255)
+  email               String                @db.VarChar(255)
+  lastName            String                @db.VarChar(255)
+  name                String                @db.VarChar(255)
+  phone               String                @db.VarChar(255)
+  photo               String                @db.VarChar(255)
+  statusId            Int
+  git                 String?               @db.VarChar(255)
+  displayName         String?               @db.VarChar(255)
+  linkedin            String?               @db.VarChar(255)
+  key                 Boolean?
+  createdAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  deletedAt           DateTime?             @db.Timestamptz(6)
+  deleted             Boolean?              @default(false)
+  areas               areas                 @relation(fields: [areaId], references: [id])
+  career              career                @relation(fields: [careerId], references: [id])
+  status              status                @relation(fields: [statusId], references: [id])
+  projectParticipants projectParticipants[]
+}
+
+model projectParticipants {
+  id        Int       @id @default(autoincrement())
+  areaId    Int
+  memberId  Int
+  projectId Int
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  deleted   Boolean?  @default(false)
+  areas     areas     @relation(fields: [areaId], references: [id])
+  members   members   @relation(fields: [memberId], references: [id])
+  projects  projects  @relation(fields: [projectId], references: [id])
+}
+
+model projects {
+  id                  Int                   @id @default(autoincrement())
+  areaId              Int
+  description         String                @db.VarChar(255)
+  name                String                @unique @db.VarChar(255)
+  topic               String?               @db.VarChar(255)
+  createdAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  deletedAt           DateTime?             @db.Timestamptz(6)
+  deleted             Boolean?              @default(false)
+  projectParticipants projectParticipants[]
+  repositories        repositories[]
+}
+
+model repositories {
+  id        Int       @id @default(autoincrement())
+  projectId Int
+  url       String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  deleted   Boolean?  @default(false)
+  projects  projects  @relation(fields: [projectId], references: [id])
+}
+
+model status {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  deleted   Boolean?  @default(false)
+  members   members[]
+}
